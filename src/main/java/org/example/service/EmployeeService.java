@@ -149,31 +149,27 @@ public class EmployeeService {
         employee.getYearlyRatings().put(year, rating);
     }
 
-    public double calculateAverageRating(Employee employee, int fromYear, int toYear) {
+    public double calculateAverageRating(Employee employee) {
         Map<Integer, Integer> ratings = employee.getYearlyRatings();
-        int sum = 0;
-        int count = 0;
-
-        for (int year = fromYear; year <= toYear; year++) {
-            if (ratings.containsKey(year)) {
-                sum += ratings.get(year);
-                count++;
-            }
+        if (ratings.isEmpty()) {
+            return 0.0;
         }
 
-        if (count == 0)
-            return 0.0;
+        int sum = 0;
+        for (Integer rating : ratings.values()) {
+            sum += rating;
+        }
 
-        return (double) sum / count;
-
+        return (double) sum / ratings.size();
     }
 
-    public Employee getTopRatingEmployee(int fromYear, int toYear) {
+
+    public Employee getTopRatingEmployee() {
         Employee top = null;
         double maxAvg = 0.0;
 
         for (Employee e : employees) {
-            double avg = calculateAverageRating(e, fromYear, toYear);
+            double avg = calculateAverageRating(e);
             if (top == null || avg > maxAvg) {
                 top = e;
                 maxAvg = avg;
