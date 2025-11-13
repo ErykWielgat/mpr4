@@ -1,5 +1,7 @@
 package org.example.model;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Objects;
 
 public class Employee {
@@ -9,6 +11,8 @@ public class Employee {
     private String company;
     private Position position;
     private double salary;
+
+    private Map<Integer, Integer> yearlyRatings = new HashMap<>();
 
     public Employee(String firstName, String lastName, String email, String company, Position position) {
         this.firstName = firstName;
@@ -71,5 +75,7 @@ public class Employee {
         }
         this.position = position;
     }
+    public Map<Integer, Integer> getYearlyRatings() { return yearlyRatings; }
+    public void setYearlyRatings(Map<Integer, Integer> yearlyRatings) { this.yearlyRatings = yearlyRatings; }
 
 }

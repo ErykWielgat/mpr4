@@ -8,6 +8,7 @@ import java.util.*;
 
 public class EmployeeService {
     private final List<Employee> employees = new ArrayList<>();
+    private final Map<Employee, List<Integer>> ratings = new HashMap<>();
 
     public void addEmployee(Employee employee) {
         for (Employee e : employees) {
@@ -137,4 +138,49 @@ public class EmployeeService {
         }
         employee.setSalary(newSalary);
     }
+
+    public void addRating(Employee employee, int year, int rating) {
+        if (!employees.contains(employee)) {
+            throw new IllegalArgumentException("Pracownik nie istnieje w bazie: " + employee.getFullName());
+        }
+        if (rating < 1 || rating > 5) {
+            throw new IllegalArgumentException("Ocena musi być w skali 1-5");
+        }
+        employee.getYearlyRatings().put(year, rating);
+    }
+
+    public double calculateAverageRating(Employee employee, int fromYear, int toYear) {
+        Map<Integer, Integer> ratings = employee.getYearlyRatings();
+        int sum = 0;
+        int count = 0;
+
+        for (int year = fromYear; year <= toYear; year++) {
+            if (ratings.containsKey(year)) {
+                sum += ratings.get(year);
+                count++;
+            }
+        }
+
+        if (count == 0)
+            return 0.0;
+
+        return (double) sum / count;
+
+    }
+
+    public Employee getTopRatingEmployee(int fromYear, int toYear) {
+        Employee top = null;
+        double maxAvg = 0.0;
+
+        for (Employee e : employees) {
+            double avg = calculateAverageRating(e, fromYear, toYear);
+            if (top == null || avg > maxAvg) {
+                top = e;
+                maxAvg = avg;
+            }
+        }
+
+        return top;
+    }
 }
+
