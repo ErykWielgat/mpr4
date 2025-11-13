@@ -117,4 +117,24 @@ public class EmployeeService {
     }
 
 
+    public void promote(Employee employee, Position newPosition) {
+        if (newPosition.getHierarchyLevel() >= employee.getPosition().getHierarchyLevel()) {
+            throw new IllegalArgumentException(
+                    "Awans możliwy tylko na wyższe stanowisko niż obecne: " + employee.getPosition());
+        }
+        employee.setSalary(newPosition.getBaseSalary());
+        employee.setPosition(newPosition);
+    }
+
+    public void giveRaise(Employee employee, double percentage) {
+        if (percentage <= 0) {
+            throw new IllegalArgumentException("Procent podwyżki musi być dodatni");
+        }
+        double newSalary = employee.getSalary() * (1 + percentage / 100);
+        if (newSalary > employee.getPosition().getMaxSalary()) {
+            throw new IllegalArgumentException(
+                    "Przekroczono maksymalną pensję dla stanowiska " + employee.getPosition());
+        }
+        employee.setSalary(newSalary);
+    }
 }
