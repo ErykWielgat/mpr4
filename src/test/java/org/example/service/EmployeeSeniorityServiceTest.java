@@ -63,25 +63,23 @@ class EmployeeSeniorityServiceTest {
 
     @ParameterizedTest(name = "Zakres {0}-{1} lat → liczba pracowników: {2}")
     @CsvSource({
-            "0,5,2",
-            "5,10,2",
+            "0,4,1",
+            "5,9,2",
             "10,20,1"
     })
     void shouldFilterEmployeesBySeniorityRange(int minYears, int maxYears, int expectedCount) {
-        Employee e1 = createEmployee("A", "A", LocalDate.now().minusYears(2));
-        Employee e2 = createEmployee("B", "B", LocalDate.now().minusYears(5));
-        Employee e3 = createEmployee("C", "C", LocalDate.now().minusYears(12));
-        Employee e4 = createEmployee("D", "D", LocalDate.now().minusYears(7));
-
-        service.addEmployee(e1);
-        service.addEmployee(e2);
-        service.addEmployee(e3);
-        service.addEmployee(e4);
+        service.addEmployee(createEmployee("A", "A", LocalDate.now().minusYears(2)));
+        service.addEmployee(createEmployee("B", "B", LocalDate.now().minusYears(5)));
+        service.addEmployee(createEmployee("C", "C", LocalDate.now().minusYears(12)));
+        service.addEmployee(createEmployee("D", "D", LocalDate.now().minusYears(7)));
 
         List<Employee> filtered = service.filterBySeniorityRange(minYears, maxYears);
 
         assertThat(filtered, hasSize(expectedCount));
-        assertThat(filtered, everyItem(notNullValue()));
+        assertThat(filtered, everyItem(allOf(
+                hasProperty("hireDate", lessThanOrEqualTo(LocalDate.now())),
+                notNullValue()
+        )));
     }
 
     @ParameterizedTest(name = "Jubileusz dla stażu {0} lat powinien = {1}")
