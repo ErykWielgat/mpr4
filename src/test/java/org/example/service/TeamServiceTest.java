@@ -41,13 +41,15 @@ class TeamServiceTest {
 
     @Test
     void shouldNotAddEmployeeWhenTeamIsFull() {
-        ProjectTeam team = service.createTeam("Gamma", 1);
+        ProjectTeam team = service.createTeam("Gamma", 2);
         Employee e1 = new Employee("A", "A", "a@example.com", "Comp", Position.MANAGER);
         Employee e2 = new Employee("B", "B", "b@example.com", "Comp", Position.PROGRAMISTA);
+        Employee e3 = new Employee("C", "C", "c@example.com", "Wino", Position.PROGRAMISTA);
 
         service.addEmployeeToTeam(e1, team);
+        service.addEmployeeToTeam(e2, team);
 
-        assertThatThrownBy(() -> service.addEmployeeToTeam(e2, team))
+        assertThatThrownBy(() -> service.addEmployeeToTeam(e3, team))
                 .isInstanceOf(IllegalStateException.class)
                 .hasMessageContaining("Team is full");
     }
