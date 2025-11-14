@@ -4,6 +4,8 @@ import org.example.model.Employee;
 import org.example.model.Position;
 import org.example.model.CompanyStatistics;
 
+import java.time.LocalDate;
+import java.time.Period;
 import java.util.*;
 
 public class EmployeeService {
@@ -179,6 +181,56 @@ public class EmployeeService {
         return top;
     }
 
+
+    public int getSeniority(Employee employee) {
+        if (employee.getHireDate() == null) {
+            throw new IllegalArgumentException("Brak daty zatrudnienia");
+        }
+        return Period.between(employee.getHireDate(), LocalDate.now()).getYears();
+    }
+
+    public Map<Integer, Integer> generateSeniorityReport() {
+        Map<Integer, Integer> map = new HashMap<>();
+
+        for (Employee e : employees) {
+            int years = getSeniority(e);
+            map.put(years, map.getOrDefault(years, 0) + 1);
+        }
+
+        return map;
+    }
+
+    public int getEmploymentYears(Employee employee) {
+        if (employee.getHireDate() == null) {
+            throw new IllegalArgumentException("Brak daty zatrudnienia");
+        }
+        return Period.between(employee.getHireDate(), LocalDate.now()).getYears();
+    }
+
+
+    public List<Employee> filterBySeniorityRange(int minYears, int maxYears) {
+        List<Employee> filteredEmployees = new ArrayList<>();
+
+        for (Employee e : employees) {
+            int years = getEmploymentYears(e);
+
+            if (years >= minYears && years <= maxYears) {
+                filteredEmployees.add(e);
+            }
+        }
+        return filteredEmployees;
+    }
+    public List<Employee> getJubileeEmployees() {
+        List<Employee> jubileeEmployees = new ArrayList<>();
+
+        for (Employee e : employees) {
+            int years = getEmploymentYears(e);
+            if (years > 0 && years % 5 == 0) {
+                jubileeEmployees.add(e);
+            }
+        }
+        return jubileeEmployees;
+    }
 
 }
 

@@ -25,6 +25,16 @@ public class Employee {
         this.salary = this.position.getBaseSalary();
     }
 
+    public Employee(String firstName, String lastName, String email, String company, Position position,LocalDate hireDate) {
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.email = email;
+        this.company = company;
+        this.position = position;
+        this.salary = this.position.getBaseSalary();
+        this.hireDate=hireDate;
+    }
+
     public String getFirstName() {
         return firstName;
     }
@@ -71,7 +81,6 @@ public class Employee {
         return String.format("%s %s (%s) - %s - %s - %.2f",
                 firstName, lastName, email, company, position, salary);
     }
-
 
 
     public void setPosition(Position position) {
