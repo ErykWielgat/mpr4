@@ -1,6 +1,7 @@
 plugins {
     id("java")
     id("application")
+    id("jacoco")
 }
 
 group = "org.example"
@@ -23,15 +24,23 @@ tasks.test {
     useJUnitPlatform()
 }
 
-java {
-    toolchain {
-        languageVersion.set(JavaLanguageVersion.of(17))
+
+tasks.jacocoTestReport {
+    reports {
+        html.required.set(true)
+        html.outputLocation.set(layout.buildDirectory.dir("custom-coverage/html"))
+
+        xml.required.set(true)
+        xml.outputLocation.set(layout.buildDirectory.file("custom-coverage/report.xml"))
+
+        csv.required.set(false)
     }
 }
 
 application {
     mainClass.set("org.example.Main")
 }
+
 java {
     toolchain {
         languageVersion.set(JavaLanguageVersion.of(23))

@@ -13,30 +13,38 @@ class TeamServiceTest {
 
     private final TeamService service = new TeamService();
 
-    @Test
-    void shouldCreateTeamWithGivenNameAndMaxSize() {
-        ProjectTeam team = service.createTeam("Alpha", 3);
 
-        assertThat(team.getName()).isEqualTo("Alpha");
-        assertThat(team.getMaxSize()).isEqualTo(3);
-        assertThat(team.getEmployees()).isEmpty();
+    @ParameterizedTest(name = "Tworzenie zespołu z maxSize={0} → oczekiwany sukces: {1}")
+    @CsvSource({
+            "1,false",
+            "3,true",
+            "5,true"
+    })
+    void shouldCreateTeamDependingOnMaxSize(int maxSize, boolean expectedSuccess) {
+        if (expectedSuccess) {
+            ProjectTeam team = service.createTeam("Team" + maxSize, maxSize);
+
+            assertThat(team.getMaxSize()).isEqualTo(maxSize);
+        } else {
+            assertThatThrownBy(() -> service.createTeam("Team" + maxSize, maxSize))
+                    .isInstanceOf(IllegalArgumentException.class)
+                    .hasMessageContaining("at least 2");
+        }
     }
 
-    @ParameterizedTest(name = "Dodanie pracownika {0} do zespołu powinno działać poprawnie")
-    @CsvSource({
-            "MANAGER",
-            "PROGRAMISTA"
-    })
-    void shouldAddEmployeeToTeam(Position pos) {
+    @Test
+    void shouldAddEmployeeToTeam() {
         ProjectTeam team = service.createTeam("Beta", 2);
-        Employee emp = new Employee("Jan", "Kowalski", "jan@example.com", "Comp", pos);
+        Employee emp = new Employee("Jan", "Kowalski", "jan@example.com", "Comp", Position.PROGRAMISTA);
 
         service.addEmployeeToTeam(emp, team);
 
         assertThat(team.getEmployees())
                 .hasSize(1)
-                .extracting(Employee::getPosition)
-                .containsExactly(pos);
+                .anySatisfy(e -> {
+                    assertThat(e.getPosition()).isEqualTo(Position.PROGRAMISTA);
+                    assertThat(e.getEmail()).isEqualTo("jan@example.com");
+                });
     }
 
     @Test
@@ -57,10 +65,25 @@ class TeamServiceTest {
     @Test
     void shouldValidateTeamCompositionWithManagerAndProgrammer() {
         ProjectTeam team = service.createTeam("Delta", 5);
-        service.addEmployeeToTeam(new Employee("M", "M", "m@example.com", "Comp", Position.MANAGER), team);
-        service.addEmployeeToTeam(new Employee("P", "P", "p@example.com", "Comp", Position.PROGRAMISTA), team);
+        Employee manager = new Employee("M", "M", "m@example.com", "Comp", Position.MANAGER);
+        Employee programmer = new Employee("P", "P", "p@example.com", "Comp", Position.PROGRAMISTA);
+
+        service.addEmployeeToTeam(manager, team);
+        service.addEmployeeToTeam(programmer, team);
 
         assertThat(service.validateTeamComposition(team)).isTrue();
+
+        assertThat(team.getEmployees())
+                .anySatisfy(e -> {
+                    assertThat(e.getPosition()).isEqualTo(Position.MANAGER);
+                    assertThat(e.getFullName()).isEqualTo("M M");
+                })
+                .anySatisfy(e -> {
+                    assertThat(e.getPosition()).isEqualTo(Position.PROGRAMISTA);
+                    assertThat(e.getFullName()).isEqualTo("P P");
+                });
+
+        assertThat(team.getEmployees()).hasSize(2);
     }
 
     @Test
@@ -70,6 +93,7 @@ class TeamServiceTest {
 
         assertThat(service.validateTeamComposition(team)).isFalse();
     }
+
 
     @Test
     void shouldMoveEmployeeBetweenTeams() {
@@ -81,7 +105,12 @@ class TeamServiceTest {
         service.moveEmployee(emp, from, to);
 
         assertThat(from.getEmployees()).isEmpty();
-        assertThat(to.getEmployees()).contains(emp);
+        assertThat(to.getEmployees())
+                .hasSize(1)
+                .anySatisfy(e -> {
+                    assertThat(e.getFullName()).isEqualTo("X X");
+                    assertThat(e.getPosition()).isEqualTo(Position.PROGRAMISTA);
+                });
     }
 
     @Test
