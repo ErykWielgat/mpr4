@@ -1,5 +1,6 @@
 package org.example.model;
 
+import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
@@ -11,6 +12,7 @@ public class Employee {
     private String company;
     private Position position;
     private double salary;
+    private LocalDate hireDate;
 
     private Map<Integer, Integer> yearlyRatings = new HashMap<>();
 
@@ -69,13 +71,26 @@ public class Employee {
         return String.format("%s %s (%s) - %s - %s - %.2f",
                 firstName, lastName, email, company, position, salary);
     }
+
+
+
     public void setPosition(Position position) {
         if (position == null) {
             throw new IllegalArgumentException("Stanowisko nie może być nullem");
         }
         this.position = position;
     }
-    public Map<Integer, Integer> getYearlyRatings() { return yearlyRatings; }
-    public void setYearlyRatings(Map<Integer, Integer> yearlyRatings) { this.yearlyRatings = yearlyRatings; }
+    public Map<Integer, Integer> getYearlyRatings() {
+        return yearlyRatings;
+    }
+    public void setYearlyRatings(Map<Integer, Integer> yearlyRatings) {
+        this.yearlyRatings = yearlyRatings;
+    }
+    public LocalDate getHireDate() {
+        return hireDate;
+    }
 
+    public void setHireDate(LocalDate hireDate) {
+        this.hireDate = hireDate;
+    }
 }
